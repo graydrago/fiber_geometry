@@ -71,7 +71,10 @@ bool FiberViewer::loadImage(const QString &fileName)
     useImage(processedImage);
 
     const QString message = tr("Opened \"%1\", %2x%3, Depth: %4")
-        .arg(QDir::toNativeSeparators(fileName)).arg(image.width()).arg(image.height()).arg(image.depth());
+        .arg(QDir::toNativeSeparators(fileName))
+		.arg(processedImage.width())
+		.arg(processedImage.height())
+		.arg(processedImage.depth());
     ui->statusBar->showMessage(message);
 
     return true;

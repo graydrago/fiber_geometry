@@ -24,7 +24,6 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-    QImage image;
 
     bool loadImage(const QString &filename);
     void useImage(const QImage &image);
