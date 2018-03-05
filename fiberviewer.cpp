@@ -21,7 +21,8 @@ FiberViewer::FiberViewer(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    for (auto &i : ui->widget_2->children()) {
+    for (auto &i : ui->widget_2->children())
+    {
         qDebug() << i->objectName();
     }
 
@@ -41,7 +42,8 @@ void FiberViewer::openImage()
 
     QFileDialog dialog{this, "Open file"};
 
-    if (firstDialog) {
+    if (firstDialog)
+    {
         firstDialog = false;
         const QStringList picturesLocations = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
         dialog.setDirectory(picturesLocations.isEmpty() ? QDir::currentPath() : picturesLocations.last());
@@ -49,7 +51,8 @@ void FiberViewer::openImage()
 
     QStringList mimeTypeFilters;
     const QByteArrayList supportedMimeTypes = QImageReader::supportedMimeTypes();
-    foreach (const QByteArray &mimeTypeName, supportedMimeTypes) {
+    foreach (const QByteArray &mimeTypeName, supportedMimeTypes)
+    {
         mimeTypeFilters.append(mimeTypeName);
     }
     mimeTypeFilters.sort();
@@ -57,8 +60,10 @@ void FiberViewer::openImage()
     dialog.selectMimeTypeFilter("image/jpeg");
     dialog.setDefaultSuffix("jpg");
 
-    while(dialog.exec() == QDialog::Accepted) {
-        if (loadImage(dialog.selectedFiles().first())) {
+    while(dialog.exec() == QDialog::Accepted)
+    {
+        if (loadImage(dialog.selectedFiles().first()))
+        {
             break;
         }
     }
@@ -89,7 +94,6 @@ void FiberViewer::useImage(const QImage &image)
 }
 
 
-//QImage FiberViewer::processGeometry(const QImage &image)
 QImage FiberViewer::processGeometry(const QString &fileName)
 {
     using namespace cv;
@@ -99,18 +103,21 @@ QImage FiberViewer::processGeometry(const QString &fileName)
 
     auto startTime = QDateTime::currentMSecsSinceEpoch();
 
-    cvtColor( src, src_gray, CV_BGR2GRAY);
-    GaussianBlur( src_gray, src_gray, Size(9, 9), 3, 3 );
+    cvtColor(src, src_gray, CV_BGR2GRAY);
+    GaussianBlur(src_gray, src_gray, Size(9, 9), 3, 3);
 
     auto coreCircles = findCore(src_gray);
     auto fiberCircles = findFiber(src_gray);
     decltype(fiberCircles) tmp;
 
-    if (coreCircles.size() > 0 && fiberCircles.size() > 0) {
-        for (auto& c : fiberCircles) {
+    if (coreCircles.size() > 0 && fiberCircles.size() > 0)
+    {
+        for (auto& c : fiberCircles)
+        {
           Point2d a(coreCircles[0][0], coreCircles[0][1]);
           Point2d b(c[0], c[1]);
-          if (norm(b - a) < coreCircles[0][2]) {
+          if (norm(b - a) < coreCircles[0][2])
+          {
               tmp.push_back(c);
           }
         }
@@ -122,9 +129,19 @@ QImage FiberViewer::processGeometry(const QString &fileName)
         fillInfoWidget(coreCircles[0], fiberCircles[0], totalTime);
         drawCircles(src, coreCircles, Scalar(255, 0, 0));
         drawCircles(src, fiberCircles, Scalar(0, 255, 0));
-    } else {
+    }
+    else
+    {
         ui->infoWidget->clear();
-        ui->infoWidget->addItem(QString("Can't find core of fiber circle."));
+        if (coreCircles.size() == 0)
+        {
+            ui->infoWidget->addItem(QString("Can't find any core circle."));
+        }
+
+        if (fiberCircles.size() == 0)
+        {
+            ui->infoWidget->addItem(QString("Can't find any fiber circle."));
+        }
     }
 
     cvtColor(src, src, CV_BGR2RGB);
@@ -156,24 +173,27 @@ void FiberViewer::fillInfoWidget(cv::Vec3f coreCircle, cv::Vec3f fiberCircle, fl
 }
 
 
-std::vector<cv::Vec3f> FiberViewer::findCore(cv::Mat &one_channel_image) {
+std::vector<cv::Vec3f> FiberViewer::findCore(cv::Mat &one_channel_image)
+{
     std::vector<cv::Vec3f> circles;
-    HoughCircles( one_channel_image, circles, CV_HOUGH_GRADIENT, 0.5, 300, 50, 30, 500, 600);
+    HoughCircles(one_channel_image, circles, CV_HOUGH_GRADIENT, 0.5, 300, 50, 30, 500, 600);
     return circles;
 }
 
 
-std::vector<cv::Vec3f> FiberViewer::findFiber(cv::Mat &one_channel_image) {
+std::vector<cv::Vec3f> FiberViewer::findFiber(cv::Mat &one_channel_image)
+{
     std::vector<cv::Vec3f> circles;
     HoughCircles(one_channel_image, circles, CV_HOUGH_GRADIENT, 0.5, 50, 20, 30, 50, 400);
     return circles;
 }
 
 
-void FiberViewer::drawCircles(cv::Mat &image, std::vector<cv::Vec3f>& circles, cv::Scalar color) {
+void FiberViewer::drawCircles(cv::Mat &image, std::vector<cv::Vec3f>& circles, cv::Scalar color)
+{
     using namespace cv;
 
-    for( size_t i = 0; i < circles.size(); i++ )
+    for(size_t i = 0; i < circles.size(); i++)
     {
         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
         int radius = cvRound(circles[i][2]);
