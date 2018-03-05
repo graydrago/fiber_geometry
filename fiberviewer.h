@@ -1,7 +1,8 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef FIBERVIEWER_H
+#define FIBERVIEWER_H
 
 #include <opencv2/imgproc/imgproc.hpp>
+#include <vector>
 #include <QMainWindow>
 
 namespace Ui {
@@ -27,12 +28,11 @@ private:
 
     bool loadImage(const QString &filename);
     void useImage(const QImage &image);
-
-    cv::vector<cv::Vec3f> findCore(cv::Mat &one_channel_image);
-    cv::vector<cv::Vec3f> findFiber(cv::Mat &one_channel_image);
-    void drawCircles(cv::Mat &image, cv::vector<cv::Vec3f>& circles);
+    std::vector<cv::Vec3f> findCore(cv::Mat &one_channel_image);
+    std::vector<cv::Vec3f> findFiber(cv::Mat &one_channel_image);
+    void drawCircles(cv::Mat &image, std::vector<cv::Vec3f>& circles, cv::Scalar color);
     QImage processGeometry(const QString &fileName);
     void fillInfoWidget(cv::Vec3f coreCircle, cv::Vec3f fiberCircle, float totalTime);
 };
 
-#endif // MAINWINDOW_H
+#endif // FIBERVIEWER_H

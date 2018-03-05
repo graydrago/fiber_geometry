@@ -117,8 +117,8 @@ QImage FiberViewer::processGeometry(const QString &fileName)
         auto totalTime = (endTime - startTime) * 0.001;
 
         fillInfoWidget(coreCircles[0], fiberCircles[0], totalTime);
-        drawCircles(src, coreCircles);
-        drawCircles(src, fiberCircles);
+        drawCircles(src, coreCircles, Scalar(255, 0, 0));
+        drawCircles(src, fiberCircles, Scalar(0, 255, 0));
     } else {
         ui->infoWidget->clear();
         ui->infoWidget->addItem(QString("Can't find core of fiber circle."));
@@ -153,28 +153,28 @@ void FiberViewer::fillInfoWidget(cv::Vec3f coreCircle, cv::Vec3f fiberCircle, fl
 }
 
 
-cv::vector<cv::Vec3f> FiberViewer::findCore(cv::Mat &one_channel_image) {
-    cv::vector<cv::Vec3f> circles;
+std::vector<cv::Vec3f> FiberViewer::findCore(cv::Mat &one_channel_image) {
+    std::vector<cv::Vec3f> circles;
     HoughCircles( one_channel_image, circles, CV_HOUGH_GRADIENT, 0.5, 300, 50, 30, 500, 600);
     return circles;
 }
 
 
-cv::vector<cv::Vec3f> FiberViewer::findFiber(cv::Mat &one_channel_image) {
-    cv::vector<cv::Vec3f> circles;
+std::vector<cv::Vec3f> FiberViewer::findFiber(cv::Mat &one_channel_image) {
+    std::vector<cv::Vec3f> circles;
     HoughCircles(one_channel_image, circles, CV_HOUGH_GRADIENT, 0.5, 50, 20, 30, 50, 400);
     return circles;
 }
 
 
-void FiberViewer::drawCircles(cv::Mat &image, cv::vector<cv::Vec3f>& circles) {
+void FiberViewer::drawCircles(cv::Mat &image, std::vector<cv::Vec3f>& circles, cv::Scalar color) {
     using namespace cv;
 
     for( size_t i = 0; i < circles.size(); i++ )
     {
         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
         int radius = cvRound(circles[i][2]);
-        circle(image, center, 3, Scalar(0,255,0), -1, 8, 0); // center
-        circle(image, center, radius, Scalar(255,0,0), 2, 8, 0); // outline
+		circle(image, center, 3, color, -1, 8, 0); // center
+        circle(image, center, radius, color, 2, 8, 0); // outline
     }
 }
